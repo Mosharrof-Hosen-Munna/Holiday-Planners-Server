@@ -12,6 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
+  gti;
   res.send("Server is running");
 });
 
