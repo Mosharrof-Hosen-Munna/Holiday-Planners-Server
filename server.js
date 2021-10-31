@@ -28,6 +28,7 @@ const run = async () => {
     const database = client.db("HolidayPlanners");
     const travelCollection = database.collection("festivalDestinations");
     const bookingOrderCollection = database.collection("bookingOrder");
+    const reviewCollection = database.collection("reviews");
 
     // GET API
 
@@ -63,7 +64,23 @@ const run = async () => {
       const cursor = bookingOrderCollection.find({});
 
       const allOrders = await cursor.toArray();
-      res.json(allOrders);
+      res.json(allOrders.reverse());
+    });
+
+    app.get("/api/booking/order/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const query = { _id: ObjectId(id) };
+
+      const result = await bookingOrderCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.get("/api/review/all", async (req, res) => {
+      const cursor = reviewCollection.find({});
+
+      const allReview = await cursor.toArray();
+      res.send(allReview.reverse());
     });
 
     // POST API
@@ -106,6 +123,24 @@ const run = async () => {
       const Result = await bookingOrderCollection.insertOne(bookingData);
 
       res.json(Result);
+    });
+
+    // create review post
+    app.post("/api/review/create", async (req, res) => {
+      const { orderID, email, name, photo, rating, message, uid } = req.body;
+
+      const reviewData = {
+        email,
+        name,
+        photo,
+        rating,
+        message,
+        orderID,
+        uid,
+      };
+
+      const result = await reviewCollection.insertOne(reviewData);
+      res.json(result);
     });
 
     // DELETE API
